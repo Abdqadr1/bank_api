@@ -1,0 +1,26 @@
+.status{
+    height:120px;
+    color: white;
+    font-weight: 700;
+    margin: 10px 8px;
+    box-sizing: border-box;
+    padding: 15px 16px;
+}
+.number{
+    font-size: 2em;
+}
+.name{
+    display: flex;
+    margin-bottom: 10px;
+}
+.name span{
+    font-size: 1em;
+    align-self: flex-end;
+}
+.updated{
+    font-weight: 400;
+    margin-top: 5px;
+    font-size: 12px;
+    padding: 0;
+    text-align: center;
+}
