@@ -6,6 +6,7 @@ import {EditModal, DeleteModal, AddModal} from './modals';
 import Container from 'react-bootstrap/Container';
 import { BankContext } from '../context/context'
 import AddBank from './addBank'
+import NavBar from './navbar';
 
 export default class Banks extends React.Component {
     constructor(props) {
@@ -151,6 +152,7 @@ export default class Banks extends React.Component {
         }
         return (
             <BankContext.Provider value={val}>
+                <NavBar />
                 <AddBank showModal={this.showModal} />
                 <Container>
                     <Table striped bordered hover size="sm">

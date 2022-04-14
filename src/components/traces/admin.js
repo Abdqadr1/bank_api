@@ -13,7 +13,7 @@ class Admin extends React.Component{
            this.state = {
                systemInfo:{
                     system: '', db: '', diskSpace: '', processor: '', upTime: ''
-               },
+                },
                httpTraces: []
            }
         this.serverUrl = process.env.REACT_APP_ACTUATOR
@@ -32,7 +32,7 @@ class Admin extends React.Component{
     }
 
     refresh = () => {
-        console.log("refreshing..")
+        console.log("refreshing...")
     }
 
     componentDidMount() {

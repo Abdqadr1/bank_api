@@ -3,6 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 // import NavDropdown from 'react-bootstrap/NavDropdown';
 import Container from 'react-bootstrap/Container';
+import { Link } from 'react-router-dom';
 
 class NavBar extends React.Component{
 
@@ -15,8 +16,9 @@ class NavBar extends React.Component{
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="w-100 me-auto justify-content-end">
-                            <Nav.Link href="#home">Home</Nav.Link>
-                            <Nav.Link href="#link">Banks</Nav.Link>
+                            <Nav.Link><Link to="/">Home</Link></Nav.Link>
+                            <Nav.Link><Link to="/banks">Banks</Link></Nav.Link>
+                            <Nav.Link><Link to="/system">System Dashboard</Link></Nav.Link>
                             {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                             <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                             <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
