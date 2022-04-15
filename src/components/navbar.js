@@ -16,9 +16,9 @@ class NavBar extends React.Component{
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="w-100 me-auto justify-content-end">
-                            <Nav.Link><Link to="/">Home</Link></Nav.Link>
-                            <Nav.Link><Link to="/banks">Banks</Link></Nav.Link>
-                            <Nav.Link><Link to="/system">System Dashboard</Link></Nav.Link>
+                            <Link role="button" className='nav-link' tabIndex={0} to="/">Home</Link>
+                            <Link role="button" className='nav-link' tabIndex={0} to="/banks">Banks</Link>
+                            <Link role="button" className='nav-link' tabIndex={0} to="/system">System Dashboard</Link>
                             {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                             <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                             <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>

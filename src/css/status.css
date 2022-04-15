@@ -17,6 +17,12 @@
     font-size: 1em;
     align-self: flex-end;
 }
+.name span.material-icons-outlined,  
+.name span.material-icons{
+    font-size: 2em;
+    align-self: flex-end;
+    margin-right: 5px;
+}
 .updated{
     font-weight: 400;
     margin-top: 5px;

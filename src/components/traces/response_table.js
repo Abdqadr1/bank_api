@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container'
 import Response from './response'
 import { ResponseModal } from '../modals'
 import '../../css/response.css'
+import { HttpTraces } from '../../context/context'
 
 class ResponseTable extends React.Component{
 
@@ -47,7 +48,15 @@ class ResponseTable extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                        <Response showModal={this.showModal} />
+                        <HttpTraces.Consumer>
+                            {(traces) => {
+                                if(traces.length < 1) return (<tr><td>No Response yet</td></tr>)
+                                return traces.map((trace, i) => 
+                                    <Response key={i} trace={trace} index={i} showModal={this.showModal} />
+                                )
+                            }}
+                        </HttpTraces.Consumer>
+                        
                     </tbody>
                 </Table>
                 <ResponseModal hideModal={this.hideModal} showModalBoolean={this.state.showModalBoolean} />
