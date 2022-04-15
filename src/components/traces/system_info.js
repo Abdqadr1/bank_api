@@ -8,12 +8,15 @@ class SystemInfo extends React.Component{
     render() {
         return (
             <SystemStatus.Consumer>
-                {(systemInfo) => (
-                          <Container fluid className='bg-light'>
+                {(systemInfo) => {
+                    const pClass = `system_info ${(systemInfo.processor && systemInfo.processor > 3) ? '' : 'text-danger'}`;
+                    const sClass = `system_info ${(systemInfo.system.toLocaleLowerCase() === 'up') ? '' : 'text-danger'}`;
+                    return (
+                        <Container fluid className='bg-light'>
                             <Row className='justify-content-between py-2'>
                                 <Col xs={10} className='d-flex justify-content-start pb-2'>
-                                    <span className='system_info'>
-                                        <span className="material-icons">dashboard</span>
+                                    <span className={sClass}>
+                                        <span className="material-icons">dns</span>
                                         <span> System: {systemInfo.system}</span>
                                     </span>
                                     <span className='system_info'>
@@ -21,11 +24,11 @@ class SystemInfo extends React.Component{
                                         <span> DB: {systemInfo.db}</span>
                                     </span>
                                     <span className='system_info'>
-                                        <span className="material-icons">save</span>
+                                        <span className="material-icons">memory</span>
                                         <span> Disk Space: {systemInfo.diskSpace}</span>
                                     </span>
-                                    <span className='system_info'>
-                                        <span className="material-icons">memory</span>
+                                    <span className={pClass}>
+                                        <span className="material-icons">developer_board</span>
                                         <span> Processor: {systemInfo.processor}</span>
                                     </span>
                                     <span className='system_info'>
@@ -38,7 +41,8 @@ class SystemInfo extends React.Component{
                                 </Col>
                             </Row>
                         </Container>
-                    )}
+                    )
+                }}
             </SystemStatus.Consumer>
             
         );

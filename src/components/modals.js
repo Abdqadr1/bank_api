@@ -224,10 +224,15 @@ export const DeleteModal = (props) => {
 }
 
 export const ResponseModal = (props) => {
+    const timeFormat = (time) => {
+        return new Intl.DateTimeFormat('en-GB', {dateStyle: 'short', timeStyle:'short'}).format(new Date(time));
+    }
+    const trace = props.trace;
+    if(!trace) return ("")
     return (
          <Modal show={props.showModalBoolean} onHide={() => props.hideModal()}>
             <Modal.Header closeButton>
-                <Modal.Title>Response Result</Modal.Title>
+                <Modal.Title>Http Trace Details</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Tab.Container defaultActiveKey="request" id='req-res-tab'>
@@ -245,10 +250,19 @@ export const ResponseModal = (props) => {
                         <Col xs={12}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="request" className='p-3 mt-2'>
-                                    <div><span className='fw-bold'>Timestamp:</span> July 34, 2020 10:45pm</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Timestamp:</span>{timeFormat(trace?.timestamp)}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Time Taken (ms):</span>{trace?.timeTaken}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Request Method:</span>{trace?.request?.method}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Remote Address:</span>{trace?.request?.remoteAddress}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>URI:</span>{trace?.request?.uri}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Origin:</span>{trace?.request?.headers?.origin}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>User Agent (Web Client):</span>{trace?.request?.headers['user-agent']}</div>
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="response" className='p-3 mt-2'>
-                                    <div><span className='fw-bold'>Status:</span> 200</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Status:</span>{trace?.response.status}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Date:</span>{trace?.response.headers['Date']}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Content-Type:</span>{trace?.response.headers['Content-Type']}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Server Allowed Origins:</span>{trace?.response.headers['Access-Control-Allow-Origin']}</div>
                                 </Tab.Pane> 
                             </Tab.Content>
                         </Col>

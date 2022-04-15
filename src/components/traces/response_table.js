@@ -13,11 +13,14 @@ class ResponseTable extends React.Component{
 
     constructor(props) {
         super(props);
-        this.state = {showModalBoolean: false}
+        this.state = { showModalBoolean: false, selectedIndex: -1 }
     }
 
-    showModal = () => {
-        this.setState({ ...this.state, showModalBoolean: true });
+    showModal = (index) => {
+        this.setState(() => ({
+            showModalBoolean: true,
+            selectedIndex: index
+        }));
     }
     hideModal = () => {
         this.setState({ ...this.state, showModalBoolean: false });
@@ -28,6 +31,10 @@ class ResponseTable extends React.Component{
      }
 
     render() {
+        const index = this.state.selectedIndex;
+        const trace = index > -1 ? this.context[index] : ""
+        const traces = (this.context.length < 1) ? <tr><td>No Response yet</td></tr> : 
+            this.context.map((trace, i) => <Response key={i} trace={trace} index={i} showModal={this.showModal} /> )
         return (
             <Container>
                 <Row className="justify-content-between my-2">
@@ -48,21 +55,15 @@ class ResponseTable extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                        <HttpTraces.Consumer>
-                            {(traces) => {
-                                if(traces.length < 1) return (<tr><td>No Response yet</td></tr>)
-                                return traces.map((trace, i) => 
-                                    <Response key={i} trace={trace} index={i} showModal={this.showModal} />
-                                )
-                            }}
-                        </HttpTraces.Consumer>
-                        
+                      {traces}  
                     </tbody>
                 </Table>
-                <ResponseModal hideModal={this.hideModal} showModalBoolean={this.state.showModalBoolean} />
+                <ResponseModal hideModal={this.hideModal} trace={trace} showModalBoolean={this.state.showModalBoolean} />
             </Container>  
         );
     }
 }
+
+ResponseTable.contextType = HttpTraces;
 
 export default ResponseTable;

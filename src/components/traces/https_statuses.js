@@ -9,7 +9,6 @@ class Statuses extends React.Component{
 
     render() {
         const figures = this.props.figures;
-        console.log(figures)
         return (
             <Container>
                 <Row className="justify-content-around">

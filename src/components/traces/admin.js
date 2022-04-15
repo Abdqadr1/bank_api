@@ -27,9 +27,8 @@ class Admin extends React.Component{
     fetchSystemInfo() {
         axios.get(`${this.serverUrl}/health`)
             .then(response => console.log(response))
-            .catch(error => console.error(error.response))
+            .catch(error => console.log(error))
     }
-
     fetchTraces() {
         axios.get(`${this.serverUrl}/httptrace`)
             .then(response => {
@@ -37,7 +36,20 @@ class Admin extends React.Component{
                     httpTraces: response.data.traces
                 }))
             })
-            .catch(error => console.error(error.response))
+            .catch(error => console.log(error))
+    }
+    fetchCPUCount() {
+         axios.get(`${this.serverUrl}/metrics/system.cpu.count`)
+             .then(response => {
+                 const number = response.data?.measurements[0].value;
+                 this.setState(() => ({
+                     systemInfo: {
+                         ...this.state.systemInfo,
+                         processor:number,
+                     }
+                 }))
+             })
+            .catch(error => console.log(error))
     }
 
     refresh = () => {
@@ -47,6 +59,7 @@ class Admin extends React.Component{
     componentDidMount() {
         this.fetchSystemInfo();
         this.fetchTraces();
+        this.fetchCPUCount();
     }
 
     render() {
@@ -91,7 +104,6 @@ class Admin extends React.Component{
                     break;
             }
         })
-        console.log(this.state.httpTraces)
         return (
             <React.Fragment>
                 <SystemStatus.Provider value={this.state.systemInfo}>
