@@ -1,0 +1,15 @@
+ul.pages{
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.pages > li{
+    cursor: pointer;
+    display: inline-block;
+}
+.pages>li:hover{
+    /* background-color: #ced4da; */
+}

@@ -9,13 +9,13 @@ const Response = (props) => {
     let className = ''
     switch (trace.response.status) {
         case 400:
-            className = 'bg-primary text-white rounded px-1'
+            className = 'bg-warning text-white rounded px-1'
             break;
         case 200:
             className = 'bg-success text-white rounded px-1'
             break;
         case 404:
-            className = 'bg-warning text-white rounded px-1'
+            className = 'bg-primary text-white rounded px-1'
             break;
         case 500:
             className = 'bg-danger text-white rounded px-1'

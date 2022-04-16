@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import { BankContext } from '../context/context'
 import AddBank from './addBank'
 import NavBar from './navbar';
+import MyPagination from './traces/pagination';
 
 export default class Banks extends React.Component {
     constructor(props) {
@@ -21,7 +22,8 @@ export default class Banks extends React.Component {
                 bool: false,
                 id: 0
             },
-            add: {bool: false, message: ""}
+            add: { bool: false, message: "" },
+            pages: {number: 10, active: 1}
         };
         this.serverURl = process.env.REACT_APP_SERVER_URL;
     }
@@ -140,6 +142,15 @@ export default class Banks extends React.Component {
             .catch(error => console.error(error));
     }
 
+    gotoPage = (number) => {
+        this.setState(state => ({
+            pages: {
+                ...state.pages,
+                active: number
+            }
+        }))
+    }
+
     render() {
         const isEmpty = this.state.banks.length < 1;
         const editId = this.state.edit.id;
@@ -150,6 +161,11 @@ export default class Banks extends React.Component {
             deleteBank: this.delete,
             editBank: this.edit
         }
+        
+        const noOfPage = Math.ceil(this.state.banks.length / this.state.pages.number)
+        const start = (this.state.pages.number * this.state.pages.active) - this.state.pages.number;
+        const end = (this.state.pages.number * this.state.pages.active)
+        const activeBanks = this.state.banks.slice(start, end)
         return (
             <BankContext.Provider value={val}>
                 <NavBar />
@@ -168,9 +184,10 @@ export default class Banks extends React.Component {
                         <tbody>
                             {isEmpty 
                                 ? <tr><td colSpan={4}>No Banks</td></tr>
-                                : this.state.banks.map(bank => <Bank key={bank.id} {...bank} showModal={this.showModal} />)}  
+                                : activeBanks.map(bank => <Bank key={bank.id} {...bank} showModal={this.showModal} />)}  
                         </tbody>
                     </Table>
+                    <MyPagination active={this.state.pages.active} go={this.gotoPage} number={noOfPage} />
                     <EditModal showModalBoolean={this.state.edit.bool} id={editId} hideModal={this.hideModal} />
                     <DeleteModal showModalBoolean={this.state.delete.bool} id={deleteId} hideModal={this.hideModal} />
                     <AddModal showModalBoolean={this.state.add.bool} hideModal={this.hideModal} response={this.state.add.message}/>

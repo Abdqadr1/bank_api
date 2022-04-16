@@ -6,6 +6,7 @@ import '../../css/status.css';
 
 
 class Statuses extends React.Component{
+    
 
     render() {
         const figures = this.props.figures;

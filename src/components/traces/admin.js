@@ -5,6 +5,8 @@ import ResponseTable from "./response_table";
 import SystemInfo from './system_info'
 import axios from 'axios';
 import { HttpTraces, SystemStatus } from "../../context/context";
+import MyPagination from "./pagination";
+import {timeFormat} from '../../utilities'
 
 class Admin extends React.Component{
     // context here
@@ -14,26 +16,37 @@ class Admin extends React.Component{
                systemInfo:{
                     system: '', db: '', diskSpace: '', processor: '', upTime: ''
                 },
-               httpTraces: []
+               httpTraces: [],
+               pages: {
+                   number: 10,
+                   active: 1
+               }
            }
-        this.serverUrl = process.env.REACT_APP_ACTUATOR
-    }
-
-    timeFormat(dateString) {
-        return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeStyle: 'short' })
-            .format(dateString);
+        this.serverUrl = process.env.REACT_APP_ACTUATOR;
+        this.timer = 0;
     }
 
     fetchSystemInfo() {
+        let data;
         axios.get(`${this.serverUrl}/health`)
-            .then(response => console.log(response))
-            .catch(error => console.log(error))
+            .then(response => data = response.data)
+            .catch(error => data = error.response.data)
+            .finally(() => {
+                this.setState(state => ({
+                    systemInfo: {
+                        ...state.systemInfo,
+                        system: data.status,
+                        db: `${data?.components.db.details.database} - ${data?.components.db.status}`,
+                        diskSpace: data?.components.diskSpace.details.free
+                    }
+                }))
+             })
     }
     fetchTraces() {
         axios.get(`${this.serverUrl}/httptrace`)
             .then(response => {
                 this.setState(() => ({
-                    httpTraces: response.data.traces
+                    httpTraces: response.data.traces.reverse()
                 }))
             })
             .catch(error => console.log(error))
@@ -42,26 +55,61 @@ class Admin extends React.Component{
          axios.get(`${this.serverUrl}/metrics/system.cpu.count`)
              .then(response => {
                  const number = response.data?.measurements[0].value;
-                 this.setState(() => ({
+                 this.setState(state => ({
                      systemInfo: {
-                         ...this.state.systemInfo,
+                         ...state.systemInfo,
                          processor:number,
                      }
                  }))
              })
             .catch(error => console.log(error))
     }
-
-    refresh = () => {
-        console.log("refreshing...")
+    fetchSystemUptime() {
+         axios.get(`${this.serverUrl}/metrics/process.uptime`)
+             .then(response => {
+                 const value = response?.data.measurements[0].value;
+                 this.setState(state => ({
+                     systemInfo: {
+                         ...state.systemInfo,
+                         upTime:value,
+                     }
+                 }))
+             })
+            .catch(error => console.log(error))
     }
-
-    componentDidMount() {
+    init() {
         this.fetchSystemInfo();
-        this.fetchTraces();
         this.fetchCPUCount();
+        this.fetchSystemUptime();
+        this.upTime();
+        this.fetchTraces();
     }
-
+    gotoPage = (number) => {
+        this.setState(state => ({
+            pages: {
+                ...state.pages,
+                active: number
+            }
+        }))
+    }
+    refresh = (f) => {
+        clearInterval(this.timer)
+        this.init()
+        f()
+    }
+    componentDidMount() {
+        this.init()
+    }
+    upTime() {
+        this.timer = setInterval(() => {
+            this.setState(state => ({
+                systemInfo: {
+                    ...state.systemInfo,
+                    upTime: state.systemInfo.upTime + 1,
+                }
+            }))
+        }, 1000)
+    }
     render() {
         const figures = {
             '_200': {
@@ -80,30 +128,34 @@ class Admin extends React.Component{
                 count: 0, time: ''
             },
         }
-        this.state.httpTraces.reverse().forEach(trace => {
+        this.state.httpTraces.forEach(trace => {
             switch (trace.response.status) {
                 case 200:
                     figures._200.count++;
-                    figures._200.time = this.timeFormat(new Date(trace.timestamp)) 
+                    figures._200.time = timeFormat(new Date(trace.timestamp)) 
                     break;
                 case 400:
                     figures._400.count++;
-                    figures._400.time = this.timeFormat(new Date(trace.timestamp)) 
+                    figures._400.time = timeFormat(new Date(trace.timestamp)) 
                     break;
                 case 404:
                     figures._404.count++;
-                    figures._404.time = this.timeFormat(new Date(trace.timestamp)) 
+                    figures._404.time = timeFormat(new Date(trace.timestamp)) 
                     break;
                 case 500:
                     figures._500.count++;
-                    figures._500.time = this.timeFormat(new Date(trace.timestamp)) 
+                    figures._500.time = timeFormat(new Date(trace.timestamp)) 
                     break;
                 default:
                     figures.default.count++;
-                    figures.default.time = this.timeFormat(new Date(trace.timestamp)) 
+                    figures.default.time = timeFormat(new Date(trace.timestamp)) 
                     break;
             }
         })
+        const noOfPage = Math.ceil(this.state.httpTraces.length / this.state.pages.number)
+        const start = (this.state.pages.number * this.state.pages.active) - this.state.pages.number;
+        const end = (this.state.pages.number * this.state.pages.active)
+        const activeTraces = this.state.httpTraces.slice(start, end)
         return (
             <React.Fragment>
                 <SystemStatus.Provider value={this.state.systemInfo}>
@@ -111,10 +163,11 @@ class Admin extends React.Component{
                 </SystemStatus.Provider>
                 <Statuses figures={figures} />    
                 <Charts figures={figures} />
-                <HttpTraces.Provider value={this.state.httpTraces}>
+                <HttpTraces.Provider value={activeTraces}>
                     <ResponseTable />
                 </HttpTraces.Provider>
-                
+                {/* pagination */}
+                <MyPagination active={this.state.pages.active} go={this.gotoPage} number={noOfPage}/>
             </React.Fragment>
         );
     }
