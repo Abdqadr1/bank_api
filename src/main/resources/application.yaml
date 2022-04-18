@@ -6,7 +6,7 @@ management:
     web:
       cors:
         allowed-origins: '*'
-        allowed-methods: GET
+        allowed-methods: '*'
       exposure:
         include: '*'
       base-path: /manage

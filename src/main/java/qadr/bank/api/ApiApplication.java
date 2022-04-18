@@ -6,6 +6,8 @@ import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import qadr.bank.api.model.Bank;
 import qadr.bank.api.service.BankService;
 
@@ -35,5 +37,8 @@ public class ApiApplication {
 			bankService.addBank(new Bank(null,"Kuda Microfinance Bank", "KUDA", "microfinance", "213445984"));
 		};
 	}
+
+	@Bean
+	BCryptPasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder();}
 
 }

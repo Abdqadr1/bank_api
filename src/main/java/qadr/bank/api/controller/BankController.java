@@ -33,12 +33,12 @@ public class BankController {
         return bankService.getBanks(type);
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public Bank deleteBank(@PathVariable("id") long id){
         return bankService.deleteBank(id);
     }
 
-    @PostMapping("/edit/{id}")
+    @PutMapping("/edit/{id}")
     public Bank editBank (@PathVariable("id") long id, @RequestBody Bank bank){
         return bankService.updateBank(id, bank);
     }

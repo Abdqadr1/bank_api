@@ -2,25 +2,31 @@ package qadr.bank.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import qadr.bank.api.errors.CustomException;
 import qadr.bank.api.model.Bank;
 import qadr.bank.api.repo.BankRepo;
 
-import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Service @RequiredArgsConstructor @Transactional
-public class BankServiceImpl implements BankService{
+public class BankServiceImpl implements BankService {
     private final BankRepo bankRepo;
 
     @Override
     public Bank addBank(Bank newBank) {
         Optional<Bank> bankOptional = bankRepo.findBySortCode(newBank.getSortCode());
         if (bankOptional.isPresent()) {
-            throw new CustomException(String.format("Sort code already exists!"), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Sort code already exists!", HttpStatus.BAD_REQUEST);
         }
         return bankRepo.save(newBank);
     }
@@ -28,13 +34,13 @@ public class BankServiceImpl implements BankService{
     @Override
     public Bank getBank(long id) {
         return bankRepo.findById(id).orElseThrow(
-                ()-> new CustomException(String.format("Bank not found"), HttpStatus.NOT_FOUND));
+                ()-> new CustomException("Bank not found", HttpStatus.NOT_FOUND));
     }
 
     @Override
     public Bank getBank(String name) {
         return bankRepo.findByShortName(name).orElseThrow(
-                ()-> new CustomException(String.format("Bank not found"), HttpStatus.NOT_FOUND));
+                ()-> new CustomException("Bank not found", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -51,7 +57,7 @@ public class BankServiceImpl implements BankService{
     public Bank deleteBank(long id) {
         Bank bank = bankRepo.findById(id)
                 .orElseThrow(
-                        ()-> new CustomException(String.format("Bank not found"), HttpStatus.NOT_FOUND)
+                        ()-> new CustomException("Bank not found", HttpStatus.NOT_FOUND)
                 );
         bankRepo.deleteById(id);
         return bank;
@@ -60,12 +66,12 @@ public class BankServiceImpl implements BankService{
     @Override
     public Bank updateBank(long id, Bank newBank) {
         Bank bank = bankRepo.findById(id).orElseThrow(
-                () -> new CustomException(String.format("Bank not found"), HttpStatus.NOT_FOUND)
+                () -> new CustomException("Bank not found", HttpStatus.NOT_FOUND)
         );
 
         Optional<Bank> bankOptional = bankRepo.findBySortCode(newBank.getSortCode());
         if (bankOptional.isPresent() && id != bankOptional.get().getId()) {
-            throw new CustomException(String.format("Sort code already exists!"), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Sort code already exists!", HttpStatus.BAD_REQUEST);
         }
 
         bank.setFullName(newBank.getFullName());
@@ -74,4 +80,5 @@ public class BankServiceImpl implements BankService{
         bank.setSortCode(newBank.getSortCode());
         return bank;
     }
+
 }
