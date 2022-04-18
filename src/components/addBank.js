@@ -8,7 +8,7 @@ const AddBank = (props) => {
         <Container className='my-3'>
             <Row className="justify-content-end">
                 <Col xs={2}>
-                    <Button onClick={() => props.showModal("add")} variant="secondary">Add Bank</Button>
+                    <Button className='px-4' onClick={() => props.showModal("add")} variant="secondary">Add Bank</Button>
                 </Col>
             </Row>
         </Container>

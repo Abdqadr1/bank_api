@@ -2,7 +2,7 @@ import './App.css';
 import Banks from "./components/banks";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Admin from './components/traces/admin';
-import Login from './components/login';
+import Home from './components/home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -10,7 +10,8 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <Routes>
-          <Route exact path='/' element={<Login />} />
+          <Route exact path='/' element={<Home />} />
+          <Route exact path='/login' element={<Home />} />
           <Route path='/banks' element={<Banks />} />
           <Route path='/system' element={<Admin />} />
         </Routes>

@@ -69,7 +69,7 @@ export default class Banks extends React.Component {
     }
     delete = (id) =>  {
         console.info("deleting...", id)
-        axios.get(`${this.serverURl}/delete/${id}`)
+        axios.delete(`${this.serverURl}/delete/${id}`)
             .then(response => { 
                 if (response.status === 200) {
                     this.setState(state => ({
@@ -88,7 +88,7 @@ export default class Banks extends React.Component {
             })
     }
     edit = (id, data) => {
-        axios.post(`${this.serverURl}/edit/${id}`, data)
+        axios.put(`${this.serverURl}/edit/${id}`, data)
             .then(response => {
                 // console.log(response, this.state);
                 if (response.status === 200) {
