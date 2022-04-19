@@ -16,7 +16,7 @@ public class LoggerService implements HealthIndicator {
         }
     }
     public boolean getLogger(){
-        return false;
+        return true;
     }
 
 }

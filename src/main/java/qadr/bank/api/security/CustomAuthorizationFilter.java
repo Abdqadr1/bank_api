@@ -25,9 +25,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-            if (request.getServletPath().equals("/login")
-                    || request.getServletPath().matches("/manage/[A-Za-z0-9-]*")){
-                log.error("Server path {} ", request.getServletPath());
+            log.error("Server path {} ", request.getServletPath());
+            if (request.getServletPath().equals("/login")){
                 filterChain.doFilter(request,response);
             } else {
                 String authHeader = request.getHeader(AUTHORIZATION);
@@ -55,7 +54,24 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     }
 
                 } else {
-                    filterChain.doFilter(request, response);
+                    if(request.getServletPath().equals("/api/add") ||
+                            request.getServletPath().equals("/api/edit") ||
+                            request.getServletPath().equals("/api/edit") ||
+                            request.getServletPath().matches("/manage/[A-Za-z0-9-]*")
+                    ){
+
+                        Map<String, String> error = new HashMap<>();
+                        error.put("error", "You have no authorization");
+                        error.put("timestamp", new Date().toString());
+                        error.put("status", HttpStatus.BAD_REQUEST.toString());
+                        response.setContentType(APPLICATION_JSON_VALUE);
+                        response.setStatus(HttpStatus.BAD_REQUEST.value());
+                        new ObjectMapper().writeValue(response.getOutputStream(), error);
+
+                    } else {
+                        filterChain.doFilter(request, response);
+                    }
+
                 }
             }
     }

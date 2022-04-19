@@ -39,10 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             return configuration;
         });
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/api/add/**").authenticated();
-        http.authorizeRequests().antMatchers("/api/edit/**").authenticated();
-        http.authorizeRequests().antMatchers("/api/delete/**").authenticated();
-//        http.authorizeRequests().antMatchers("/manage/**").authenticated();
+        http.authorizeRequests().antMatchers("/api/add/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/api/edit/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/api/delete/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN");
 
         http.authorizeRequests().anyRequest().permitAll();
         http.formLogin();
