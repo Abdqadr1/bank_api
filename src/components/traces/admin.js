@@ -21,67 +21,91 @@ class Admin extends React.Component{
                pages: {
                    number: 10,
                    active: 1
-               },
-               user: localStorage.getItem("user")
+               }
            }
         this.serverUrl = process.env.REACT_APP_ACTUATOR;
         this.timer = 0;
+        this.user = JSON.parse(localStorage.getItem("user"))
         this.abortController = new AbortController();
     }
 
     fetchSystemInfo() {
         let data;
-        axios.get(`${this.serverUrl}/health`, { signal: this.abortController.signal })
-            .then(response => {if (response) data = response.data})
-            .catch(error => { if (error.response) data = error.response.data})
-            .finally(() => {
-                if (data) {
-                    this.setState(state => ({
-                        systemInfo: {
-                            ...state.systemInfo,
-                            system: data.status,
-                            db: `${data?.components.db.details.database} - ${data?.components.db.status}`,
-                            diskSpace: data?.components.diskSpace.details.free
-                        }
-                    }))
-                }
-             })
+        axios.get(`${this.serverUrl}/health`, {
+            signal: this.abortController.signal,
+            headers: {
+                    "Authorization" : "Bearer " + this.user?.access_token
+            }
+        })
+        .then(response => { if (response) data = response.data
+        })
+        .catch(error => {
+            console.log(error.response)
+            if (error.response.status === 503) data = error.response.data
+        })
+        .finally(() => {
+            if (data) {
+                this.setState(state => ({
+                    systemInfo: {
+                        ...state.systemInfo,
+                        system: data.status,
+                        db: `${data?.components.db.details.database} - ${data?.components.db.status}`,
+                        diskSpace: data?.components.diskSpace.details.free
+                    }
+                }))
+            }
+        })
     }
     fetchTraces() {
-        axios.get(`${this.serverUrl}/httptrace`, {signal: this.abortController.signal})
-            .then(response => {
-                this.setState(() => ({
-                    httpTraces: response.data.traces.reverse()
-                }))
-            })
-            .catch(error => console.log(error))
+        axios.get(`${this.serverUrl}/httptrace`, {
+            signal: this.abortController.signal,
+            headers: {
+                    "Authorization" : "Bearer " + this.user?.access_token
+                }
+        })
+        .then(response => {
+            this.setState(() => ({
+                httpTraces: response.data.traces.reverse()
+            }))
+        })
+        .catch(error => console.log(error))
     }
     fetchCPUCount() {
-         axios.get(`${this.serverUrl}/metrics/system.cpu.count`, {signal: this.abortController.signal})
-             .then(response => {
-                 const number = response.data?.measurements[0].value;
-                 this.setState(state => ({
-                     systemInfo: {
-                         ...state.systemInfo,
-                         processor:number,
-                     }
-                 }))
-             })
-            .catch(error => console.log(error))
+        axios.get(`${this.serverUrl}/metrics/system.cpu.count`, {
+            signal: this.abortController.signal,
+            headers: {
+                    "Authorization" : "Bearer " + this.user?.access_token
+            }
+        })
+            .then(response => {
+                const number = response.data?.measurements[0].value;
+                this.setState(state => ({
+                    systemInfo: {
+                        ...state.systemInfo,
+                        processor:number,
+                    }
+                }))
+            })
+        .catch(error => console.log(error))
     }
     fetchSystemUptime() {
-         axios.get(`${this.serverUrl}/metrics/process.uptime`, {signal: this.abortController.signal})
-             .then(response => {
-                 const value = response?.data.measurements[0].value;
-                 this.setState(state => ({
-                     systemInfo: {
-                         ...state.systemInfo,
-                         upTime:value,
-                     }
-                 }))
-                this.upTime()
-             })
-            .catch(error => console.log(error))
+        axios.get(`${this.serverUrl}/metrics/process.uptime`, {
+            signal: this.abortController.signal,
+            headers: {
+                    "Authorization" : "Bearer " + this.user?.access_token
+            }
+        })
+        .then(response => {
+            const value = response?.data.measurements[0].value;
+            this.setState(state => ({
+                systemInfo: {
+                    ...state.systemInfo,
+                    upTime:value,
+                }
+            }))
+        this.upTime()
+        })
+        .catch(error => console.log(error))
     }
     init() {
         Promise.all([this.fetchSystemInfo(), this.fetchCPUCount(), this.fetchSystemUptime(), this.fetchTraces()])
@@ -116,8 +140,7 @@ class Admin extends React.Component{
         this.abortController.abort();
     }
     render() {
-        const user = JSON.parse(this.state.user);
-        if(!user?.access_token) return (<Navigate to={'/login'} />) 
+        if(!this.user?.access_token) return (<Navigate to={'/login'} />) 
         const figures = {
             '_200': {
                 count: 0, time: ''

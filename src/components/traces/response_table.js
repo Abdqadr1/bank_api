@@ -33,7 +33,7 @@ class ResponseTable extends React.Component{
     render() {
         const index = this.state.selectedIndex;
         const trace = index > -1 ? this.context[index] : ""
-        const traces = (this.context.length < 1) ? <tr><td>No Response yet</td></tr> : 
+        const traces = (this.context.length < 1) ? <tr><td colSpan={6}>No Response yet</td></tr> : 
             this.context.map((trace, i) => <Response key={i} trace={trace} index={i} showModal={this.showModal} /> )
         return (
             <Container>
