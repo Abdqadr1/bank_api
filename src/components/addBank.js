@@ -7,7 +7,7 @@ const AddBank = (props) => {
     return ( 
         <Container className='my-3'>
             <Row className="justify-content-end">
-                <Col xs={2}>
+                <Col xs={4} className="d-flex justify-content-end">
                     <Button className='px-4' onClick={() => props.showModal("add")} variant="secondary">Add Bank</Button>
                 </Col>
             </Row>

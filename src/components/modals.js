@@ -22,7 +22,6 @@ export const EditModal = (props) => {
         type: ''
     });
     const [canClose, setClose] = useState(true);
-    const [alert, setAlert] = useState({variant: "success", class:"d-none", message: ""});
     const buttonRef = useRef(null);
     const msgRef = useRef(null);
 
@@ -32,11 +31,12 @@ export const EditModal = (props) => {
     }
 
     useEffect(() => {
-        const bank = banks[banks.findIndex(bk => bk.id === props.id)]
+        const bank = banks[banks.findIndex(bk => bk.id === props.edit.id)]
         if (bank) {
             setForm(bank);
         }
-    }, [banks, form, props.id])
+        msgRef.current?.focus();
+    }, [banks, form, props.edit.id])
 
     const handleClose = () => {
         if (canClose) {
@@ -49,30 +49,25 @@ export const EditModal = (props) => {
         setClose(false);
         buttonRef.current.innerHTML = loading;
         buttonRef.current.disabled = true;
-        console.log("submitting...", form);
-        if (editBank(props.id, form)) {
-            setAlert({
-                variant: "danger", class: "text-center", message: "Something went wrong"
-            })
-        }
-        setClose(true);
-        buttonRef.current.innerHTML = "Save Changes";
+        editBank(props.edit.id, form)
+        buttonRef.current.innerHTML = 'Save Changes';
         buttonRef.current.disabled = false;
-        msgRef.current.focus();
-        
+        setClose(true)
     }
 
     return (
         <BankContext.Consumer>
             {({banks}) => {
-                const bank = banks[banks.findIndex(bk => bk.id === props.id)] || form;
+                const bank = banks[banks.findIndex(bk => bk.id === props.edit.id)] || form;
+                const prop = props.edit;
+                const className = (prop.message) ? "text-center" : 'd-none';
                 return (
-                <Modal show={props.showModalBoolean} onHide={handleClose}>
+                <Modal show={prop.bool} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Edit Bank</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Alert ref={msgRef} variant={alert.variant} className={alert.class}>{alert.message}</Alert>
+                        <Alert ref={msgRef} variant={prop.variant || "success"} className={className}>{prop.message}</Alert>
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="fullName">
                                 <Form.Label>Bank name</Form.Label>
@@ -111,7 +106,6 @@ export const AddModal = (props) => {
         type: ''
     });
     const [canClose, setClose] = useState(true);
-    const [alert, setAlert] = useState({variant: "danger", message: ""});
     const buttonRef = useRef(null);
     const msgRef = useRef(null);
 
@@ -119,13 +113,6 @@ export const AddModal = (props) => {
         form[event.target.id] = event.target.value;
         setForm(form)
     }
-
-    // useEffect(() => {
-    //     const bank = banks[banks.findIndex(bk => bk.id === props.id)]
-    //     if (bank) {
-    //         setForm(bank);
-    //     }
-    // }, [banks, form, props.id])
 
     const handleClose = () => {
         if (canClose) {
@@ -138,30 +125,25 @@ export const AddModal = (props) => {
         setClose(false);
         buttonRef.current.innerHTML = loading;
         buttonRef.current.disabled = true;
-        console.log("submitting...", form);
-        if (addBank(form)) {
-            setAlert({
-                variant: "danger", class: "text-center", message: "Something went wrong"
-            })
-        }
-        setClose(true);
+        addBank(form)
         buttonRef.current.innerHTML = "Add Bank";
         buttonRef.current.disabled = false;
-        msgRef.current.focus();
-        
+        msgRef.current?.focus();
+        setClose(true);
     }
 
     return (
         <BankContext.Consumer>
             {() => {
-                const className = (props.response) ? "text-center" : "d-none";
+                const prop = props.add
+                const className = (prop.message) ? "text-center" : "d-none";
                 return (
-                <Modal show={props.showModalBoolean} onHide={handleClose}>
+                <Modal show={prop.bool} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add Bank</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Alert ref={msgRef} variant={alert.variant} className={className}>{props.response}</Alert>
+                        <Alert ref={msgRef} variant={prop.variant} className={className}>{prop.message}</Alert>
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="fullName">
                                 <Form.Label>Bank name</Form.Label>
@@ -196,25 +178,24 @@ export const DeleteModal = (props) => {
     const buttonRef = useRef(null);
     const msgRef = useRef(null);
     const handleDelete = (id) => {
-        buttonRef.current.innerHTML = loading;
         if (!deleteBank(id)) {
-            msgRef.current.textContent = "Something went wrong. Try again"
+            buttonRef.current.innerHTML = 'Delete';
         }
     }
     return ( 
         <BankContext.Consumer>
             {() => (
-                <Modal show={props.showModalBoolean} onHide={() => props.hideModal('delete')}>
+                <Modal show={props.delete.bool} onHide={() => props.hideModal('delete')}>
                     <Modal.Header closeButton>
                         <Modal.Title>Confirmation</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p ref={msgRef}>Are you sure you want to delete this item?</p>
+                        <p ref={msgRef}>{props.delete.message || "Are you sure you want to delete this item?"}</p>
                     </Modal.Body>
 
                     <Modal.Footer>
                         <Button variant="secondary"  onClick={() => props.hideModal('delete')}>Cancel</Button>
-                        <Button variant="danger" ref={buttonRef}  onClick={() => handleDelete(props.id)}>Delete</Button>
+                        <Button variant="danger" ref={buttonRef}  onClick={() => handleDelete(props.delete.id)}>Delete</Button>
                     </Modal.Footer>
                 </Modal>
             )}

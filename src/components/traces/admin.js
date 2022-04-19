@@ -7,6 +7,7 @@ import axios from 'axios';
 import { HttpTraces, SystemStatus } from "../../context/context";
 import MyPagination from "./pagination";
 import {timeFormat} from '../../utilities'
+import { Navigate } from 'react-router-dom';
 
 class Admin extends React.Component{
     // context here
@@ -20,30 +21,34 @@ class Admin extends React.Component{
                pages: {
                    number: 10,
                    active: 1
-               }
+               },
+               user: localStorage.getItem("user")
            }
         this.serverUrl = process.env.REACT_APP_ACTUATOR;
         this.timer = 0;
+        this.abortController = new AbortController();
     }
 
     fetchSystemInfo() {
         let data;
-        axios.get(`${this.serverUrl}/health`)
-            .then(response => data = response.data)
-            .catch(error => data = error.response.data)
+        axios.get(`${this.serverUrl}/health`, { signal: this.abortController.signal })
+            .then(response => {if (response) data = response.data})
+            .catch(error => { if (error.response) data = error.response.data})
             .finally(() => {
-                this.setState(state => ({
-                    systemInfo: {
-                        ...state.systemInfo,
-                        system: data.status,
-                        db: `${data?.components.db.details.database} - ${data?.components.db.status}`,
-                        diskSpace: data?.components.diskSpace.details.free
-                    }
-                }))
+                if (data) {
+                    this.setState(state => ({
+                        systemInfo: {
+                            ...state.systemInfo,
+                            system: data.status,
+                            db: `${data?.components.db.details.database} - ${data?.components.db.status}`,
+                            diskSpace: data?.components.diskSpace.details.free
+                        }
+                    }))
+                }
              })
     }
     fetchTraces() {
-        axios.get(`${this.serverUrl}/httptrace`)
+        axios.get(`${this.serverUrl}/httptrace`, {signal: this.abortController.signal})
             .then(response => {
                 this.setState(() => ({
                     httpTraces: response.data.traces.reverse()
@@ -52,7 +57,7 @@ class Admin extends React.Component{
             .catch(error => console.log(error))
     }
     fetchCPUCount() {
-         axios.get(`${this.serverUrl}/metrics/system.cpu.count`)
+         axios.get(`${this.serverUrl}/metrics/system.cpu.count`, {signal: this.abortController.signal})
              .then(response => {
                  const number = response.data?.measurements[0].value;
                  this.setState(state => ({
@@ -65,7 +70,7 @@ class Admin extends React.Component{
             .catch(error => console.log(error))
     }
     fetchSystemUptime() {
-         axios.get(`${this.serverUrl}/metrics/process.uptime`)
+         axios.get(`${this.serverUrl}/metrics/process.uptime`, {signal: this.abortController.signal})
              .then(response => {
                  const value = response?.data.measurements[0].value;
                  this.setState(state => ({
@@ -74,15 +79,12 @@ class Admin extends React.Component{
                          upTime:value,
                      }
                  }))
+                this.upTime()
              })
             .catch(error => console.log(error))
     }
     init() {
-        this.fetchSystemInfo();
-        this.fetchCPUCount();
-        this.fetchSystemUptime();
-        this.upTime();
-        this.fetchTraces();
+        Promise.all([this.fetchSystemInfo(), this.fetchCPUCount(), this.fetchSystemUptime(), this.fetchTraces()])
     }
     gotoPage = (number) => {
         this.setState(state => ({
@@ -97,9 +99,6 @@ class Admin extends React.Component{
         this.init()
         f()
     }
-    componentDidMount() {
-        this.init()
-    }
     upTime() {
         this.timer = setInterval(() => {
             this.setState(state => ({
@@ -110,7 +109,15 @@ class Admin extends React.Component{
             }))
         }, 1000)
     }
+    componentDidMount() {
+        this.init()
+    }
+    componentWillUnmount() {
+        this.abortController.abort();
+    }
     render() {
+        const user = JSON.parse(this.state.user);
+        if(!user?.access_token) return (<Navigate to={'/login'} />) 
         const figures = {
             '_200': {
                 count: 0, time: ''

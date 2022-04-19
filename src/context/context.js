@@ -13,5 +13,3 @@ export const SystemStatus = React.createContext({
 export const HttpTraces = React.createContext({
 
 })
-
-export const UserContext = React.createContext({});
