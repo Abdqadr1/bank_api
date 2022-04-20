@@ -91,7 +91,9 @@ class Admin extends React.Component{
         })
             .then(response => {
                 const figures = this.state.figures;
-                const httpTraces = response.data.traces.reverse().map(trace => {
+                const httpTraces = response.data.traces.reverse()
+                    .filter(trace => !trace.request.uri.includes('manage'))
+                    .map(trace => {
                     switch (trace.response.status) {
                         case 200:
                             figures._200.count++;
@@ -118,7 +120,7 @@ class Admin extends React.Component{
                         ...trace,
                         timestamp: timeFormat(new Date(trace.timestamp))
                     }
-                })
+                }).reverse()
                 this.setState(() => ({ httpTraces, figures}))
         })
         .catch(error => console.log(error))
