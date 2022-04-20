@@ -45,7 +45,6 @@ const Charts = (props) => {
         <Container className='py-4'>
             <Row className="justify-content-between">
                 <Col className='text-start'>
-                    <div>HTTP RESPONSE</div>
                     <Bar 
                         width={300}
                         height={300}
@@ -55,7 +54,6 @@ const Charts = (props) => {
                         />
                 </Col>
                 <Col className='text-start d-flex justify-content-end'>
-                    <div>HTTP RESPONSE</div>
                     <Pie 
                         width={300}
                         height={300}
