@@ -9,6 +9,7 @@ import MyPagination from "./pagination";
 import {timeFormat} from '../../utilities'
 import { Navigate } from 'react-router-dom';
 import { CSVLink } from 'react-csv'
+import NavBar from '../navbar';
 
 class Admin extends React.Component{
     // context here
@@ -208,6 +209,7 @@ class Admin extends React.Component{
         }
         return (
             <React.Fragment>
+                <NavBar />
                 <SystemStatus.Provider value={this.state.systemInfo}>
                     <SystemInfo refresh={this.refresh}/>
                 </SystemStatus.Provider>
