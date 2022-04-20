@@ -1,4 +1,5 @@
 export const timeFormat = (dateString) => {
+        dateString = dateString instanceof Date ? dateString : new Date(dateString)
         return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeStyle: 'short' })
             .format(dateString);
 }

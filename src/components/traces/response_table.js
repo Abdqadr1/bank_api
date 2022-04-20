@@ -1,7 +1,6 @@
 import React from 'react'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table'
 import Container from 'react-bootstrap/Container'
 import Response from './response'
@@ -14,6 +13,7 @@ class ResponseTable extends React.Component{
     constructor(props) {
         super(props);
         this.state = { showModalBoolean: false, selectedIndex: -1 }
+        this.tableRef = React.createRef();
     }
 
     showModal = (index) => {
@@ -26,9 +26,15 @@ class ResponseTable extends React.Component{
         this.setState({ ...this.state, showModalBoolean: false });
     }
 
-    exportToExcel = () => {
-        console.log("exporting to excel ...")
-     }
+    // exportToExcel = () => {
+    //     const link = document.createElement("a");
+    //     const tableHTML = this.tableRef.current?.outerHTML.replace(/ /g, '%20')
+    //     const dataType = 'application/vnd.ms-excel';
+    //     document.body.appendChild(link)
+    //     link.href = 'data:' + dataType + ' ' + tableHTML;
+    //     link.download = 'http_traces.xls'
+    //     link.click()
+    //  }
 
     render() {
         const index = this.state.selectedIndex;
@@ -36,14 +42,12 @@ class ResponseTable extends React.Component{
         const traces = (this.context.length < 1) ? <tr><td colSpan={6}>No Response yet</td></tr> : 
             this.context.map((trace, i) => <Response key={i} trace={trace} index={i} showModal={this.showModal} /> )
         return (
-            <Container>
+            <Container id='response_root'>
                 <Row className="justify-content-between my-2">
                     <Col xs={4} md={3}><h4>HTTP Traces</h4></Col>
-                    <Col xs={4} md={3}>
-                        <Button onClick={this.exportToExcel} variant='primary'>Export to excel</Button>
-                    </Col>
+                    <Col xs={4} md={3}>{this.props.export}</Col>
                 </Row>
-                 <Table bordered hover size="sm">
+                 <Table bordered hover size="sm" ref={this.tableRef}>
                     <thead>
                         <tr>
                         <th>Timestamp</th>

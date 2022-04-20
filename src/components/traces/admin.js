@@ -8,25 +8,50 @@ import { HttpTraces, SystemStatus } from "../../context/context";
 import MyPagination from "./pagination";
 import {timeFormat} from '../../utilities'
 import { Navigate } from 'react-router-dom';
+import { CSVLink } from 'react-csv'
 
 class Admin extends React.Component{
     // context here
     constructor(props) {
         super(props)
-           this.state = {
-               systemInfo:{
-                    system: '', db: '', diskSpace: '', processor: '', upTime: ''
+        this.state = {
+            systemInfo:{
+                system: '', db: '', diskSpace: '', processor: '', upTime: ''
+            },
+            httpTraces: [],
+            pages: {
+                number: 10,
+                active: 1
+            },
+            figures: {
+                '_200': {
+                    count: 0, time: ''
                 },
-               httpTraces: [],
-               pages: {
-                   number: 10,
-                   active: 1
-               }
-           }
+                '_400': {
+                    count: 0, time: ''
+                },
+                '_404': {
+                    count: 0, time: ''
+                },
+                '_500': {
+                    count: 0, time: ''
+                },
+                'default':{
+                    count: 0, time: ''
+                },
+            }
+        }
         this.serverUrl = process.env.REACT_APP_ACTUATOR;
         this.timer = 0;
         this.user = JSON.parse(localStorage.getItem("user"))
         this.abortController = new AbortController();
+        this.headers = [
+            { label: "Timestamp", key:"timestamp"},
+            { label: "Method", key:"request.method"},
+            { label: "Time taken(ms)", key:"timeTaken"},
+            { label: "Status", key:"response.status"},
+            { label: "URI", key:"request.uri"}
+        ]
     }
 
     fetchSystemInfo() {
@@ -63,10 +88,37 @@ class Admin extends React.Component{
                     "Authorization" : "Bearer " + this.user?.access_token
                 }
         })
-        .then(response => {
-            this.setState(() => ({
-                httpTraces: response.data.traces.reverse()
-            }))
+            .then(response => {
+                const figures = this.state.figures;
+                const httpTraces = response.data.traces.reverse().map(trace => {
+                    switch (trace.response.status) {
+                        case 200:
+                            figures._200.count++;
+                            figures._200.time = timeFormat(new Date(trace.timestamp)) 
+                            break;
+                        case 400:
+                            figures._400.count++;
+                            figures._400.time = timeFormat(new Date(trace.timestamp)) 
+                            break;
+                        case 404:
+                            figures._404.count++;
+                            figures._404.time = timeFormat(new Date(trace.timestamp)) 
+                            break;
+                        case 500:
+                            figures._500.count++;
+                            figures._500.time = timeFormat(new Date(trace.timestamp)) 
+                            break;
+                        default:
+                            figures.default.count++;
+                            figures.default.time = timeFormat(new Date(trace.timestamp)) 
+                            break;
+                    }
+                    return {
+                        ...trace,
+                        timestamp: timeFormat(new Date(trace.timestamp))
+                    }
+                })
+                this.setState(() => ({ httpTraces, figures}))
         })
         .catch(error => console.log(error))
     }
@@ -141,51 +193,19 @@ class Admin extends React.Component{
     }
     render() {
         if(!this.user?.access_token) return (<Navigate to={'/login'} />) 
-        const figures = {
-            '_200': {
-                count: 0, time: ''
-            },
-            '_400': {
-                count: 0, time: ''
-            },
-            '_404': {
-                count: 0, time: ''
-            },
-            '_500': {
-                count: 0, time: ''
-            },
-            'default':{
-                count: 0, time: ''
-            },
+        
+        const {httpTraces, figures, pages} = this.state
+        const noOfPage = Math.ceil(httpTraces.length / pages.number)
+        const start = (pages.number * pages.active) - pages.number;
+        const end = (pages.number * pages.active)
+        const activeTraces = httpTraces.slice(start, end)
+        // csv report
+        const report = {
+            filename: "http_traces.csv",
+            headers: this.headers,
+            data: this.state.httpTraces, 
+            className: 'btn btn-primary'
         }
-        this.state.httpTraces.forEach(trace => {
-            switch (trace.response.status) {
-                case 200:
-                    figures._200.count++;
-                    figures._200.time = timeFormat(new Date(trace.timestamp)) 
-                    break;
-                case 400:
-                    figures._400.count++;
-                    figures._400.time = timeFormat(new Date(trace.timestamp)) 
-                    break;
-                case 404:
-                    figures._404.count++;
-                    figures._404.time = timeFormat(new Date(trace.timestamp)) 
-                    break;
-                case 500:
-                    figures._500.count++;
-                    figures._500.time = timeFormat(new Date(trace.timestamp)) 
-                    break;
-                default:
-                    figures.default.count++;
-                    figures.default.time = timeFormat(new Date(trace.timestamp)) 
-                    break;
-            }
-        })
-        const noOfPage = Math.ceil(this.state.httpTraces.length / this.state.pages.number)
-        const start = (this.state.pages.number * this.state.pages.active) - this.state.pages.number;
-        const end = (this.state.pages.number * this.state.pages.active)
-        const activeTraces = this.state.httpTraces.slice(start, end)
         return (
             <React.Fragment>
                 <SystemStatus.Provider value={this.state.systemInfo}>
@@ -194,7 +214,7 @@ class Admin extends React.Component{
                 <Statuses figures={figures} />    
                 <Charts figures={figures} />
                 <HttpTraces.Provider value={activeTraces}>
-                    <ResponseTable />
+                    <ResponseTable export={<CSVLink {...report}>Export to CSV</CSVLink>} />
                 </HttpTraces.Provider>
                 {/* pagination */}
                 <MyPagination active={this.state.pages.active} go={this.gotoPage} number={noOfPage}/>

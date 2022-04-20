@@ -1,9 +1,5 @@
 
-
 const Response = (props) => {
-    const timeFormat = (time) => {
-        return new Intl.DateTimeFormat('en-GB', {dateStyle: 'short', timeStyle:'short'}).format(new Date(time));
-    }
 
     const trace = props.trace;
     let className = ''
@@ -27,7 +23,7 @@ const Response = (props) => {
 
     return ( 
         <tr>
-            <td>{timeFormat(trace.timestamp)}</td>
+            <td>{trace.timestamp}</td>
             <td>{trace.request.method}</td>
             <td>{trace.timeTaken}</td>
             <td><span className={className}>{trace.response.status}</span></td>
