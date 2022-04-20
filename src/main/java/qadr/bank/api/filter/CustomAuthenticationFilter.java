@@ -1,4 +1,4 @@
-package qadr.bank.api.security;
+package qadr.bank.api.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import qadr.bank.api.errors.CustomException;
+import qadr.bank.api.security.JWTUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

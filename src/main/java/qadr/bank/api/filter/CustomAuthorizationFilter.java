@@ -1,4 +1,4 @@
-package qadr.bank.api.security;
+package qadr.bank.api.filter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import qadr.bank.api.security.JWTUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
