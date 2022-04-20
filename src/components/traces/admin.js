@@ -90,9 +90,24 @@ class Admin extends React.Component{
                 }
         })
             .then(response => {
-                const figures = this.state.figures;
+                const figures = {
+                '_200': {
+                    count: 0, time: ''
+                },
+                '_400': {
+                    count: 0, time: ''
+                },
+                '_404': {
+                    count: 0, time: ''
+                },
+                '_500': {
+                    count: 0, time: ''
+                },
+                'default':{
+                    count: 0, time: ''
+                },
+            }
                 const httpTraces = response.data.traces.reverse()
-                    .filter(trace => !trace.request.uri.includes('manage'))
                     .map(trace => {
                     switch (trace.response.status) {
                         case 200:
