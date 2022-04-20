@@ -47,7 +47,7 @@ class ResponseTable extends React.Component{
                     <Col xs={4} md={3}><h4>HTTP Traces</h4></Col>
                     <Col xs={4} md={3}>{this.props.export}</Col>
                 </Row>
-                 <Table bordered hover size="sm" ref={this.tableRef}>
+                 <Table striped bordered hover size="sm" ref={this.tableRef}>
                     <thead>
                         <tr>
                         <th>Timestamp</th>
@@ -58,7 +58,7 @@ class ResponseTable extends React.Component{
                         <th>view</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='border-top-0'>
                       {traces}  
                     </tbody>
                 </Table>

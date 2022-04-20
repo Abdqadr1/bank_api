@@ -205,9 +205,6 @@ export const DeleteModal = (props) => {
 }
 
 export const ResponseModal = (props) => {
-    const timeFormat = (time) => {
-        return new Intl.DateTimeFormat('en-GB', {dateStyle: 'short', timeStyle:'short'}).format(new Date(time));
-    }
     const trace = props.trace;
     if(!trace) return ("")
     return (
@@ -231,11 +228,11 @@ export const ResponseModal = (props) => {
                         <Col xs={12}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="request" className='p-3 mt-2'>
-                                    <div className='mb-2'><span className='fw-bold me-3'>Timestamp:</span>{timeFormat(trace?.timestamp)}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3'>Timestamp:</span>{trace?.timestamp}</div>
                                     <div className='mb-2'><span className='fw-bold me-3'>Time Taken (ms):</span>{trace?.timeTaken}</div>
                                     <div className='mb-2'><span className='fw-bold me-3'>Request Method:</span>{trace?.request?.method}</div>
                                     <div className='mb-2'><span className='fw-bold me-3'>Remote Address:</span>{trace?.request?.remoteAddress}</div>
-                                    <div className='mb-2'><span className='fw-bold me-3'>URI:</span>{trace?.request?.uri}</div>
+                                    <div className='mb-2'><span className='fw-bold me-3 text-break'>URI:</span>{trace?.request?.uri}</div>
                                     <div className='mb-2'><span className='fw-bold me-3'>Origin:</span>{trace?.request?.headers?.origin}</div>
                                     <div className='mb-2'><span className='fw-bold me-3'>User Agent (Web Client):</span>{trace?.request?.headers['user-agent']}</div>
                                 </Tab.Pane>
