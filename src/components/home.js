@@ -45,9 +45,8 @@ const Login = () => {
                 localStorage.setItem("user", JSON.stringify(response.data))
                 navigate('/banks');
         }).catch(error => {
-            console.log(error.response)
             setAlert({
-                message: error.response.data.message,
+                message: error?.response.data.message,
                 variant: 'danger',
                 class: 'text-center py-2'
             })

@@ -40,11 +40,11 @@ class Admin extends React.Component{
                 'default':{
                     count: 0, time: ''
                 },
-            }
+            },
+            user: JSON.parse(localStorage.getItem("user"))
         }
         this.serverUrl = process.env.REACT_APP_ACTUATOR;
         this.timer = 0;
-        this.user = JSON.parse(localStorage.getItem("user"))
         this.abortController = new AbortController();
         this.headers = [
             { label: "Timestamp", key:"timestamp"},
@@ -60,15 +60,15 @@ class Admin extends React.Component{
         axios.get(`${this.serverUrl}/health`, {
             signal: this.abortController.signal,
             headers: {
-                    "Authorization" : "Bearer " + this.user?.access_token
+                    "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
         .then(response => { if (response) data = response.data
         })
         .catch(error => {
-            console.log(error.response)
             if (error.response.status === 503) data = error.response.data
-        })
+            if (error.response.status === 406) this.setState(() => ({ user: { } } ))
+        }) 
         .finally(() => {
             if (data) {
                 this.setState(state => ({
@@ -86,7 +86,7 @@ class Admin extends React.Component{
         axios.get(`${this.serverUrl}/httptrace`, {
             signal: this.abortController.signal,
             headers: {
-                    "Authorization" : "Bearer " + this.user?.access_token
+                    "Authorization" : "Bearer " + this.state.user?.access_token
                 }
         })
             .then(response => {
@@ -138,13 +138,15 @@ class Admin extends React.Component{
                 }).reverse()
                 this.setState(() => ({ httpTraces, figures}))
         })
-        .catch(error => console.log(error))
+            .catch(error => {
+                if (error.response.status === 406) this.setState(() => ({ user: { } } ))
+            })
     }
     fetchCPUCount() {
         axios.get(`${this.serverUrl}/metrics/system.cpu.count`, {
             signal: this.abortController.signal,
             headers: {
-                    "Authorization" : "Bearer " + this.user?.access_token
+                    "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
             .then(response => {
@@ -156,13 +158,15 @@ class Admin extends React.Component{
                     }
                 }))
             })
-        .catch(error => console.log(error))
+            .catch(error => {
+                if (error.response.status === 406) this.setState(() => ({ user: { } } ))
+            })
     }
     fetchSystemUptime() {
         axios.get(`${this.serverUrl}/metrics/process.uptime`, {
             signal: this.abortController.signal,
             headers: {
-                    "Authorization" : "Bearer " + this.user?.access_token
+                    "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
         .then(response => {
@@ -173,9 +177,11 @@ class Admin extends React.Component{
                     upTime:value,
                 }
             }))
-        this.upTime()
+            this.upTime()
         })
-        .catch(error => console.log(error))
+            .catch(error => {
+                if (error.response.status === 406) this.setState(() => ({ user: { } } ))
+            })
     }
     init() {
         Promise.all([this.fetchSystemInfo(), this.fetchCPUCount(), this.fetchSystemUptime(), this.fetchTraces()])
@@ -210,7 +216,7 @@ class Admin extends React.Component{
         this.abortController.abort();
     }
     render() {
-        if(!this.user?.access_token) return (<Navigate to={'/login'} />) 
+        if(!this.state.user?.access_token) return (<Navigate to={'/login'} />) 
         
         const {httpTraces, figures, pages} = this.state
         const noOfPage = Math.ceil(httpTraces.length / pages.number)

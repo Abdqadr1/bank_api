@@ -20,9 +20,9 @@ class Banks extends React.Component {
             },
             add: { bool: false},
             pages: { number: 10, active: 1 },
+            user: JSON.parse(localStorage.getItem('user'))
         };
         this.serverURl = process.env.REACT_APP_SERVER_URL;
-        this.user = JSON.parse(localStorage.getItem('user'))
         this.abortController = new AbortController();
     }
 
@@ -68,7 +68,7 @@ class Banks extends React.Component {
     delete = (id) =>  {
         axios.delete(`${this.serverURl}/delete/${id}`, {
             headers: {
-                "Authorization" : "Bearer " + this.user?.access_token
+                "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
             .then(() => { 
@@ -78,42 +78,47 @@ class Banks extends React.Component {
                 }))
             })
             .catch(error => {
-                console.log(error.response)
                 if (error.response) {
-                    this.setState(state => ({
-                        delete: {...state.delete, message: error.response.data.error
-                        }
-                    }))
+                    if (error.response.status === 406) this.setState(() => ({ user: {} }))
+                    else {
+                        this.setState(state => ({
+                            delete: {...state.delete, message: error.response.data.error
+                            }
+                        }))
+                    }
+                    
                 }
             })
     }
     edit = (id, data) => {
         axios.put(`${this.serverURl}/edit/${id}`, data, {
             headers: {
-                "Authorization" : "Bearer " + this.user?.access_token
+                "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
-            .then(response => {
-                // console.log(response, this.state);
+            .then(() => {
                 this.setState(state => ({
                     edit: {...state.edit, message: 'Changes saved', variant: 'success'}
                 }))
             })
             .catch(error => {
                 const data = error.response.data
-                this.setState(state => ({
-                    edit: {...state.edit, message: data.error || data.message, variant: 'danger'}
-                }))
+                if (error.response.status === 406) this.setState(() => ({ user: {} }))
+                else {
+                    this.setState(state => ({
+                        edit: {...state.edit, message: data.error || data.message, variant: 'danger'}
+                    }))
+                }
+                
             })
     }
     add = (data) => {
         axios.post(`${this.serverURl}/add`, data, {
             headers: {
-                "Authorization" : "Bearer " + this.user?.access_token
+                "Authorization" : "Bearer " + this.state.user?.access_token
             }
         })
             .then(response => {
-                console.log(response);
                 this.state.banks.push(response.data);
                 this.setState(state => ({
                     add: {...state.add, message: 'Bank added!', variant:'success'}
@@ -122,13 +127,16 @@ class Banks extends React.Component {
             .catch(error => {
                 console.error("error", error.response)
                 if (error.response) {
-                    console.log("response", error.response)
-                    const data = error.response.data;
-                    const message = data.message || data.error;
-                    this.setState(state => ({
-                        add: {...state.add, message, variant:'danger'}
-                        })
-                    )
+                    if (error.response.status === 406) this.setState(() => ({ user: {} }))
+                    else {
+                        const data = error.response.data;
+                        const message = data.message || data.error;
+                        this.setState(state => ({
+                            add: {...state.add, message, variant:'danger'}
+                            })
+                        )
+                    }
+                   
                 }
             })
     }
@@ -140,7 +148,9 @@ class Banks extends React.Component {
                     banks: data.data,
                 })
             })
-            .catch(error => console.error(error.response));
+            .catch(error => {
+                if (error?.response.status === 406) this.setState(() => ({ user: { } } ))
+            });
     }
 
     gotoPage = (number) => {
@@ -156,7 +166,7 @@ class Banks extends React.Component {
     }
 
     render() {
-        if(!this.user?.access_token) return (<Navigate to={'/login'} />) 
+        if(!this.state.user?.access_token) return (<Navigate to={'/login'} />) 
         const isEmpty = this.state.banks.length < 1;
         const val = {
             banks: this.state.banks,
