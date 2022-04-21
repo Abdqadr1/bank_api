@@ -1,5 +1,6 @@
 package qadr.bank.api.filter;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                         filterChain.doFilter(request, response);
 
-                    } catch (Exception exception){
+                    } catch (TokenExpiredException exception){
+                        Map<String, String> error = new HashMap<>();
+                        error.put("error", exception.getMessage());
+                        error.put("timestamp", new Date().toString());
+                        error.put("status", HttpStatus.NOT_ACCEPTABLE.toString());
+                        response.setContentType(APPLICATION_JSON_VALUE);
+                        response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+                        new ObjectMapper().writeValue(response.getOutputStream(), error);
+
+                    }catch (Exception exception){
                         Map<String, String> error = new HashMap<>();
                         error.put("error", exception.getMessage());
                         error.put("timestamp", new Date().toString());
