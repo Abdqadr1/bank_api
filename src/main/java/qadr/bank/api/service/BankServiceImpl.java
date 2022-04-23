@@ -2,19 +2,12 @@ package qadr.bank.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import qadr.bank.api.errors.CustomException;
 import qadr.bank.api.model.Bank;
 import qadr.bank.api.repo.BankRepo;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,8 +26,9 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public Bank getBank(long id) {
-        return bankRepo.findById(id).orElseThrow(
-                ()-> new CustomException("Bank not found", HttpStatus.NOT_FOUND));
+        Optional<Bank> bankOptional =  bankRepo.findById(id);
+        if (bankOptional.isEmpty()) throw new CustomException("Bank not found", HttpStatus.NOT_FOUND);
+        return bankOptional.get();
     }
 
     @Override
