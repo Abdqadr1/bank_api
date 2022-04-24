@@ -16,6 +16,8 @@ public class CustomHttpTraceFilter extends HttpTraceFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().contains("/manage");
+        return request.getServletPath().contains("/manage") ||
+                request.getServletPath().contains("/authenticate")||
+                request.getServletPath().contains("/login");
     }
 }

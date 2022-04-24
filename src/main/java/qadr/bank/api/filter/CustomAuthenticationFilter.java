@@ -53,8 +53,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Map<String, String> tokens = new HashMap<>();
         tokens.put("status", HttpStatus.BAD_REQUEST.toString());
         tokens.put("message", failed.getMessage());
-        tokens.put("username", request.getParameter("username"));
-        tokens.put("password", request.getParameter("password"));
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);

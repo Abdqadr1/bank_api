@@ -57,7 +57,7 @@ class BankServiceImplTest {
     @Test
     void getBankById() {
         //given
-        long id = 2;
+        int id = 2;
          Bank bank = new Bank(id,"United Bank of Africa", "UBA",
                         "Commercial", "3759845984");
         given(bankRepo.findById(id)).willReturn(Optional.of(bank));
@@ -65,13 +65,13 @@ class BankServiceImplTest {
          //when
         bankService.getBank(id);
          //then
-        verify(bankRepo).findById(anyLong());
+        verify(bankRepo).findById(anyInt());
 
 //         given(bankRepo.findById(id)).willReturn(Optional.of(bank));
-         given(bankRepo.findById(1L)).willReturn(Optional.empty());
+         given(bankRepo.findById(1)).willReturn(Optional.empty());
 
         //then
-        assertThatThrownBy(()->bankService.getBank(1L))
+        assertThatThrownBy(()->bankService.getBank(1))
                 .hasMessageContaining("not found").isInstanceOf(CustomException.class);
 
     }
@@ -119,7 +119,7 @@ class BankServiceImplTest {
     @Test
     void deleteBank() {
         //given
-        long id = 2L;
+        int id = 2;
 
         //when and then
         assertThatThrownBy(() -> bankService.deleteBank(id))
@@ -136,7 +136,7 @@ class BankServiceImplTest {
     @Test
     void updateBank() {
         //given
-        long id = 1L;
+        int id = 1;
         Bank bank = new Bank(id,"United Bank of Africa", "UBA",
                 "Commercial", "3759845984");
         Bank nBank = new Bank(id,"United Bank of Nigeria", "UBA",
@@ -148,7 +148,7 @@ class BankServiceImplTest {
 
         //given
         given(bankRepo.findById(any())).willReturn(Optional.of(bank));
-        bank.setId(2L);
+        bank.setId(2);
         given(bankRepo.findBySortCode(any())).willReturn(Optional.of(bank));
         //when and then
         assertThatThrownBy(() -> bankService.updateBank(id, bank))

@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN");
 
         http.authorizeRequests().anyRequest().permitAll();
-        http.formLogin();
+        http.formLogin().disable();
 
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
