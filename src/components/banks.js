@@ -142,14 +142,14 @@ class Banks extends React.Component {
     }
 
     componentDidMount() {
-        axios.get(this.serverURl,{signal: this.abortController.signal})
+        axios.get(this.serverURl+"/",{signal: this.abortController.signal})
             .then(data => {
                 this.setState({
                     banks: data.data,
                 })
             })
             .catch(error => {
-                if (error?.response.status === 406) this.setState(() => ({ user: { } } ))
+                if (error?.response?.status === 406) this.setState(() => ({ user: { } } ))
             });
     }
 

@@ -12,7 +12,7 @@ import { useRef, useState } from "react";
 
 const Login = () => {
 
-    const url = process.env.REACT_APP_URL;
+    const url = process.env.REACT_APP_SERVER_URL;
     const loading = `<div class="spinner-grow spinner-grow-sm" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>`;
@@ -32,7 +32,7 @@ const Login = () => {
         buttonRef.current.disabled = true;
         buttonRef.current.innerHTML = loading;
         // on error
-        axios.post(`${url}/login`, data, {
+        axios.post(`${url}/authenticate`, data, {
             headers: { "Content-Type": "multipart/form-data"},
             transformRequest: [function (data, headers) {
                 const formData = new FormData();
