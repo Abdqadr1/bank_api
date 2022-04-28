@@ -2,6 +2,7 @@ package qadr.bank.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import qadr.bank.api.errors.CustomException;
 import qadr.bank.api.model.Bank;
@@ -22,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController @RequiredArgsConstructor
-@RequestMapping("/api") @CrossOrigin("*")
+@RequestMapping("/bank") @CrossOrigin("*")
 public class BankController {
     private final BankService bankService;
     private final AuthenticationManager authenticationManager;
@@ -36,7 +37,7 @@ public class BankController {
         return bankService.addBank(bank);
     }
 
-    @GetMapping
+    @GetMapping("/")
     public List<Bank> getAll(){
         return bankService.getAll();
     }
@@ -70,7 +71,7 @@ public class BankController {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
 
         User user = (User) userDetailService.loadUserByUsername(username);
@@ -81,15 +82,6 @@ public class BankController {
     }
 
 }
-@Configuration
-class MyUserDetailService implements UserDetailsService{
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return User.builder()
-                .username("admin")
-                .password("$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
-                .roles("ADMIN")
-                .build();
-    }
-}
+
+
 

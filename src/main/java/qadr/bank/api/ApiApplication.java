@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import qadr.bank.api.controller.MyUserDetailService;
 import qadr.bank.api.model.Bank;
 import qadr.bank.api.service.BankService;
 
@@ -27,16 +28,21 @@ public class ApiApplication {
 		return new InMemoryHttpTraceRepository();
 	}
 
+
 	@Bean
-	CommandLineRunner run(BankService bankService) {
-		return args -> {
-			bankService.addBank(new Bank(null,"United Bank of Africa", "UBA", "Commercial", "3759845984"));
-			bankService.addBank(new Bank(null,"Guaranty Trust Bank", "GTB", "Commercial", "3752635984"));
-			bankService.addBank(new Bank(null,"Zenith Bank", "ZENITH", "Commercial", "3701345984"));
-			bankService.addBank(new Bank(null,"First Bank", "FIRSTBANK", "Commercial", "1342845984"));
-			bankService.addBank(new Bank(null,"Kuda Microfinance Bank", "KUDA", "microfinance", "213445984"));
-		};
+	public MyUserDetailService getMyUserDetailService(BCryptPasswordEncoder bCryptPasswordEncoder){
+		return new MyUserDetailService(bCryptPasswordEncoder);
 	}
+//	@Bean
+//	CommandLineRunner run(BankService bankService) {
+//		return args -> {
+//			bankService.addBank(new Bank(null,"United Bank of Africa", "UBA", "Commercial", "3759845984"));
+//			bankService.addBank(new Bank(null,"Guaranty Trust Bank", "GTB", "Commercial", "3752635984"));
+//			bankService.addBank(new Bank(null,"Zenith Bank", "ZENITH", "Commercial", "3701345984"));
+//			bankService.addBank(new Bank(null,"First Bank", "FIRSTBANK", "Commercial", "1342845984"));
+//			bankService.addBank(new Bank(null,"Kuda Microfinance Bank", "KUDA", "microfinance", "213445984"));
+//		};
+//	}
 
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder();}

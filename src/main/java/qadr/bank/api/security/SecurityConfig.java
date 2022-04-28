@@ -1,8 +1,10 @@
 package qadr.bank.api.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -12,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import qadr.bank.api.filter.CustomAuthenticationFilter;
@@ -19,11 +23,13 @@ import qadr.bank.api.filter.CustomAuthorizationFilter;
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @Override
@@ -37,15 +43,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             return configuration;
         });
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/api/add/**").hasRole("ADMIN");
-        http.authorizeRequests().antMatchers("/api/edit/**").hasRole("ADMIN");
-        http.authorizeRequests().antMatchers("/api/delete/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/bank/add/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/bank/edit/**").hasRole("ADMIN");
+        http.authorizeRequests().antMatchers("/bank/delete/**").hasRole("ADMIN");
         http.authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN");
 
         http.authorizeRequests().anyRequest().permitAll();
         http.formLogin().disable();
 
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+//        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
@@ -53,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         UserDetails admin = User.builder()
                 .username("admin")
-                .password("$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
+                .password(bCryptPasswordEncoder.encode("discowale"))
                 .roles("ADMIN")
                 .build();
         auth.inMemoryAuthentication().withUser(admin);

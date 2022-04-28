@@ -1,10 +1,10 @@
 package qadr.bank.api.service;
 
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Service;
 import qadr.bank.api.model.Bank;
 
 import java.util.List;
-
 public interface BankService {
     Bank addBank(Bank bank);
     Bank getBank(int id);

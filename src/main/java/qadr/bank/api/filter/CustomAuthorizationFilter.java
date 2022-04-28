@@ -28,62 +28,42 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
             log.error("Server path {} ", request.getServletPath());
-            if (request.getServletPath().equals("/login")){
-                filterChain.doFilter(request,response);
-            } else {
-                String authHeader = request.getHeader(AUTHORIZATION);
-                if (authHeader != null && authHeader.startsWith("Bearer ")){
-                    try {
-                        String token = authHeader.substring("Bearer ".length());
-                        DecodedJWT decodedJWT = JWTUtil.verifyToken(token);
-                        String username = decodedJWT.getSubject();
-                        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                        stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(username, null, authorities);
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                        filterChain.doFilter(request, response);
+            String authHeader = request.getHeader(AUTHORIZATION);
+            if (authHeader != null && authHeader.startsWith("Bearer ")){
+                try {
+                    String token = authHeader.substring("Bearer ".length());
+                    DecodedJWT decodedJWT = JWTUtil.verifyToken(token);
+                    String username = decodedJWT.getSubject();
+                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+                    stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    filterChain.doFilter(request, response);
 
-                    } catch (TokenExpiredException exception){
-                        Map<String, String> error = new HashMap<>();
-                        error.put("error", exception.getMessage());
-                        error.put("timestamp", new Date().toString());
-                        error.put("status", HttpStatus.NOT_ACCEPTABLE.toString());
-                        response.setContentType(APPLICATION_JSON_VALUE);
-                        response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
-                        new ObjectMapper().writeValue(response.getOutputStream(), error);
+                } catch (TokenExpiredException exception){
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error", exception.getMessage());
+                    error.put("timestamp", new Date().toString());
+                    error.put("status", HttpStatus.NOT_ACCEPTABLE.toString());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
 
-                    }catch (Exception exception){
-                        Map<String, String> error = new HashMap<>();
-                        error.put("error", exception.getMessage());
-                        error.put("timestamp", new Date().toString());
-                        error.put("status", HttpStatus.BAD_REQUEST.toString());
-                        response.setContentType(APPLICATION_JSON_VALUE);
-                        response.setStatus(HttpStatus.BAD_REQUEST.value());
-                        new ObjectMapper().writeValue(response.getOutputStream(), error);
-                    }
-
-                } else {
-                    if(request.getServletPath().equals("/api/add") ||
-                            request.getServletPath().equals("/api/edit") ||
-                            request.getServletPath().equals("/api/edit") ||
-                            request.getServletPath().matches("/manage/[A-Za-z0-9-]*")
-                    ){
-
-                        Map<String, String> error = new HashMap<>();
-                        error.put("error", "You have no authorization");
-                        error.put("timestamp", new Date().toString());
-                        error.put("status", HttpStatus.BAD_REQUEST.toString());
-                        response.setContentType(APPLICATION_JSON_VALUE);
-                        response.setStatus(HttpStatus.BAD_REQUEST.value());
-                        new ObjectMapper().writeValue(response.getOutputStream(), error);
-
-                    } else {
-                        filterChain.doFilter(request, response);
-                    }
-
+                }catch (Exception exception){
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error", exception.getMessage());
+                    error.put("timestamp", new Date().toString());
+                    error.put("status", HttpStatus.BAD_REQUEST.toString());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
+
+            } else {
+                    filterChain.doFilter(request, response);
             }
+
     }
 }
