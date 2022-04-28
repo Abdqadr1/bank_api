@@ -195,7 +195,7 @@ class Banks extends React.Component {
                         </thead>
                         <tbody className='border-top-0'>
                             {isEmpty 
-                                ? <tr><td colSpan={5}>No Bank found</td></tr>
+                                ? <tr><td colSpan={5} className="text-center">No Bank found</td></tr>
                                 : activeBanks.map(bank => <Bank key={bank.id} {...bank} showModal={this.showModal} />)}  
                         </tbody>
                     </Table>
