@@ -13,8 +13,12 @@ class Bank extends React.Component{
                 <td>
                     <Row className='justify-content-center'>
                         <Col className="d-flex justify-content-center">
-                            <Button className="mx-1" variant="outline-primary" title="edit" onClick={() => props.showModal('edit', props.id)}>Edit</Button>
-                            <Button className="mx-1" variant="outline-danger" title="delete" onClick={() => props.showModal('delete',props.id)}>Delete</Button>
+                            <Button className="mx-1 p-1 action" variant="outline-primary" title="edit" onClick={() => props.showModal('edit', props.id)}>
+                                <span className="material-icons pb-0">edit</span>
+                            </Button>
+                            <Button className="mx-1 p-1 action" variant="outline-danger" title="delete" onClick={() => props.showModal('delete', props.id)}>
+                                <span className="material-icons pb-0">delete</span>
+                            </Button>
                         </Col>
                     </Row>
                 </td>
