@@ -26,16 +26,6 @@ class ResponseTable extends React.Component{
         this.setState({ ...this.state, showModalBoolean: false });
     }
 
-    // exportToExcel = () => {
-    //     const link = document.createElement("a");
-    //     const tableHTML = this.tableRef.current?.outerHTML.replace(/ /g, '%20')
-    //     const dataType = 'application/vnd.ms-excel';
-    //     document.body.appendChild(link)
-    //     link.href = 'data:' + dataType + ' ' + tableHTML;
-    //     link.download = 'http_traces.xls'
-    //     link.click()
-    //  }
-
     render() {
         const index = this.state.selectedIndex;
         const trace = index > -1 ? this.context[index] : ""
@@ -44,10 +34,10 @@ class ResponseTable extends React.Component{
         return (
             <Container id='response_root'>
                 <Row className="justify-content-between my-2">
-                    <Col xs={4} md={3}><h4>HTTP Traces</h4></Col>
-                    <Col xs={4} md={3}>{this.props.export}</Col>
+                    <Col xs={5} md={3}><h4>HTTP Traces</h4></Col>
+                    <Col xs={5} md={3}>{this.props.export}</Col>
                 </Row>
-                 <Table striped bordered hover size="sm" ref={this.tableRef}>
+                 <Table striped bordered responsive hover size="sm" ref={this.tableRef}>
                     <thead>
                         <tr>
                         <th>Timestamp</th>

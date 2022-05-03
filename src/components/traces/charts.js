@@ -43,23 +43,25 @@ const Charts = (props) => {
 
     return ( 
         <Container className='py-4'>
-            <Row className="justify-content-between">
-                <Col className='text-start'>
+            <Row className="text-start justify-content-center justify-content-md-between">
+                <Col className='my-md-0 my-2'>
                     <Bar 
                         width={300}
                         height={300}
                         options={barOptions}
                         ref={chartRef}
                         data={barData}
+                        className="mx-auto"
                         />
                 </Col>
-                <Col className='text-start d-flex justify-content-end'>
+                <Col className='d-flex justify-content-start justify-content-md-end my-md-0 my-2'>
                     <Pie 
                         width={300}
                         height={300}
                         options={barOptions}
                         ref={pieRef}
                         data={barData}
+                        className="mx-auto"
                         />
                 </Col>
             </Row>

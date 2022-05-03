@@ -22,7 +22,7 @@ class SystemInfo extends React.Component{
                     return (
                         <Container fluid className='bg-light'>
                             <Row className='justify-content-between py-2'>
-                                <Col xs={10} className='d-flex justify-content-start pb-2'>
+                                <Col xs={6} md={10} className='system-col pb-2'>
                                     <span className={sClass}>
                                         <span className="material-icons">dns</span>
                                         <span> System: {systemInfo.system}</span>
@@ -44,8 +44,8 @@ class SystemInfo extends React.Component{
                                         <span> Up Time: {time}</span>
                                     </span>
                                 </Col>
-                                <Col xs={2} className='d-flex justify-content-end'>
-                                    <Button variant='success' onClick={this.refresh}>Refresh Data</Button>
+                                <Col xs={6} md={2} className='d-flex justify-content-end'>
+                                    <Button variant='success' className='refresh-btn' onClick={this.refresh}>Refresh Data</Button>
                                 </Col>
                             </Row>
                         </Container>

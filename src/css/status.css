@@ -30,3 +30,14 @@
     padding: 0;
     text-align: center;
 }
+
+@media screen and (max-width: 720px) {
+    .status {
+        height: 140px;
+    }
+    .name span.material-icons-outlined,
+    .name span.material-icons {
+        font-size: 1.5em;
+        align-self: center
+    }
+}

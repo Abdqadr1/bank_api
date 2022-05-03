@@ -26,3 +26,22 @@
 .material-icons{
     margin-bottom: 2px;
 }
+.system-col{
+    display: flex;
+    justify-content: flex-start
+}
+
+@media screen and (max-width: 720px) {
+    .system_info span {
+        font-size: 12px !important;
+    }
+
+    .system-col{
+        flex-wrap: wrap;
+    }
+    .refresh-btn{
+        height: fit-content;
+        align-self: center;
+    }
+    
+}
