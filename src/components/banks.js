@@ -10,6 +10,11 @@ import NavBar from './navbar';
 import MyPagination from './traces/pagination';
 import { Navigate } from 'react-router-dom';
 
+
+const loading = `<div class="spinner-grow spinner-grow-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>`;
+
 class Banks extends React.Component {
     constructor(props) {
         super(props);
@@ -65,7 +70,9 @@ class Banks extends React.Component {
             ))
         }
     }
-    delete = (id) =>  {
+    delete = (id, button) =>  {
+        button.innerHTML = loading;
+        button.disabled = true;
         axios.delete(`${this.serverURl}/delete/${id}`, {
             headers: {
                 "Authorization" : "Bearer " + this.state.user?.access_token
@@ -76,6 +83,8 @@ class Banks extends React.Component {
                     banks: state.banks.filter(bank => bank.id !== id),
                     delete: {bool:false, id: 0}
                 }))
+                button.innerHTML = "Delete";
+                button.disabled = false;
             })
             .catch(error => {
                 if (error.response) {
@@ -88,9 +97,13 @@ class Banks extends React.Component {
                     }
                     
                 }
+                button.innerHTML = "Delete";
+                button.disabled = false;
             })
     }
-    edit = (id, data) => {
+    edit = (id, data, button) => {
+        button.innerHTML = loading;
+        button.disabled = true;
         axios.put(`${this.serverURl}/edit/${id}`, data, {
             headers: {
                 "Authorization" : "Bearer " + this.state.user?.access_token
@@ -100,6 +113,9 @@ class Banks extends React.Component {
                 this.setState(state => ({
                     edit: {...state.edit, message: 'Changes saved', variant: 'success'}
                 }))
+                
+                button.innerHTML = "Save Changes";
+                button.disabled = false;
             })
             .catch(error => {
                 const data = error.response.data
@@ -109,10 +125,13 @@ class Banks extends React.Component {
                         edit: {...state.edit, message: data.error || data.message, variant: 'danger'}
                     }))
                 }
-                
+                button.innerHTML = "Save Changes";
+                button.disabled = false;
             })
     }
-    add = (data) => {
+    add = (data, button) => {
+        button.innerHTML = loading;
+        button.disabled = true;
         axios.post(`${this.serverURl}/add`, data, {
             headers: {
                 "Authorization" : "Bearer " + this.state.user?.access_token
@@ -123,6 +142,8 @@ class Banks extends React.Component {
                 this.setState(state => ({
                     add: {...state.add, message: 'Bank added!', variant:'success'}
                 }))
+                button.innerHTML = "Add Bank";
+                button.disabled = false;
             })
             .catch(error => {
                 console.error("error", error.response)
@@ -138,6 +159,8 @@ class Banks extends React.Component {
                     }
                    
                 }
+                button.innerHTML = "Add Bank";
+                button.disabled = false;
             })
     }
 

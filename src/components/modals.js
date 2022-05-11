@@ -9,10 +9,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Nav } from 'react-bootstrap';
 
-const loading = `<div class="spinner-grow spinner-grow-sm" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>`;
-
 export const EditModal = (props) => {
     const { editBank, banks } = useContext(BankContext);
     const [form, setForm] = useState({
@@ -47,11 +43,7 @@ export const EditModal = (props) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setClose(false);
-        buttonRef.current.innerHTML = loading;
-        buttonRef.current.disabled = true;
-        editBank(props.edit.id, form)
-        buttonRef.current.innerHTML = 'Save Changes';
-        buttonRef.current.disabled = false;
+        editBank(props.edit.id, form, buttonRef.current)
         setClose(true)
     }
 
@@ -107,7 +99,7 @@ export const AddModal = (props) => {
     });
     const [canClose, setClose] = useState(true);
     const buttonRef = useRef(null);
-    const [alert, setAlert] = useState(false);
+    const closeAlert = () => msgRef.current.classList.toggle("d-none")
     const msgRef = useRef(null);
 
     const handleChange = (event) => {
@@ -124,11 +116,7 @@ export const AddModal = (props) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setClose(false);
-        buttonRef.current.innerHTML = loading;
-        buttonRef.current.disabled = true;
-        addBank(form)
-        buttonRef.current.innerHTML = "Add Bank";
-        buttonRef.current.disabled = false;
+        addBank(form, buttonRef.current)
         msgRef.current?.focus();
         setClose(true);
     }
@@ -144,7 +132,7 @@ export const AddModal = (props) => {
                         <Modal.Title>Add Bank</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                            <Alert show={alert} ref={msgRef} variant={prop.variant} className={className} dismissible onClose={()=>setAlert(false)}>
+                            <Alert ref={msgRef} variant={prop.variant} className={className} dismissible onClose={closeAlert}>
                                 {prop.message}
                             </Alert>
                         <Form onSubmit={handleSubmit}>
@@ -181,9 +169,7 @@ export const DeleteModal = (props) => {
     const buttonRef = useRef(null);
     const msgRef = useRef(null);
     const handleDelete = (id) => {
-        if (!deleteBank(id)) {
-            buttonRef.current.innerHTML = 'Delete';
-        }
+        deleteBank(id, buttonRef.current)
     }
     return ( 
         <BankContext.Consumer>
