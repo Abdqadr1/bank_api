@@ -183,7 +183,7 @@ class Banks extends React.Component {
                 <NavBar />
                 <AddBank showModal={this.showModal} />
                 <Container>
-                    <Table striped bordered responsive hover size="sm">
+                    <Table striped bordered hover size="sm">
                         <thead>
                             <tr>
                             <th>Full Name</th>
