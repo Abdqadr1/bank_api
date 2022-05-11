@@ -107,6 +107,7 @@ export const AddModal = (props) => {
     });
     const [canClose, setClose] = useState(true);
     const buttonRef = useRef(null);
+    const [alert, setAlert] = useState(false);
     const msgRef = useRef(null);
 
     const handleChange = (event) => {
@@ -143,7 +144,9 @@ export const AddModal = (props) => {
                         <Modal.Title>Add Bank</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Alert ref={msgRef} variant={prop.variant} className={className}>{prop.message}</Alert>
+                            <Alert show={alert} ref={msgRef} variant={prop.variant} className={className} dismissible onClose={()=>setAlert(false)}>
+                                {prop.message}
+                            </Alert>
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3" controlId="fullName">
                                 <Form.Label>Bank name</Form.Label>
