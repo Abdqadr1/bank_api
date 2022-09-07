@@ -1,0 +1,8 @@
+button.action {
+  width: 40px;
+  height: 35px;
+}
+
+div:focus {
+  outline: none !important;
+}
